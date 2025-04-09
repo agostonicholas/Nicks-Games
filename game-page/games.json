@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "Pongy",
+        "description": "Table tennis game",
+        "image": "../game-page/pong/pong-thumbnail.png"
+    },
+
+    {
+        "id": 2,
+        "name": "Game 2",
+        "description": "Description for Game 2",
+        "image": ""
+    },
+
+    {
+        "id": 3,
+        "name": "Game 3",
+        "description": "Description for Game 3",
+        "image": ""
+    }
+]
