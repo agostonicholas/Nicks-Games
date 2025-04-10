@@ -3,20 +3,28 @@
         "id": 1,
         "name": "Pongy",
         "description": "Table tennis game",
-        "image": "../game-page/pong/pong-thumbnail.png"
+        "image": "../game-page/pong/pong-thumbnail.png",
+        "link": "https://example.com/pongy"
     },
-
     {
         "id": 2,
         "name": "Game 2",
         "description": "Description for Game 2",
-        "image": ""
+        "image": "",
+        "link": ""
     },
-
     {
         "id": 3,
         "name": "Game 3",
         "description": "Description for Game 3",
-        "image": ""
+        "image": "",
+        "link": ""
+    },
+    {
+        "id": 4,
+        "name": "Game 4",
+        "description": "Description for Game 4",
+        "image": "",
+        "link": ""
     }
 ]
