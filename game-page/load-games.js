@@ -8,7 +8,7 @@ fetch("../game-page/games.json")
       gameCard.innerHTML = `
         ${imageHTML}
         <h3>${game.name}</h3>
-        <a href="${game.link}" class="play-button">Play Now</a>
+        <a href="${game.link}?id=${game.id}" class="play-button">Play Now</a>
       `;
       document.querySelector(".game-grid").appendChild(gameCard);
     });

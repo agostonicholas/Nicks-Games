@@ -54,6 +54,12 @@ body {
     color: lime;
   }
 
+  .game-canvas{
+    display: block;
+    margin: 40px auto;
+    border: 5px solid lime;
+  }
+
   /* animations */
 
   .game-card:hover {
