@@ -29,3 +29,12 @@ It’s something I plan to revisit, but for now I’ve re-focused on keeping the
 I'm considering writing this README in a kind of patch notes/dev journal format going forward, 
 where each iteration documents what I added, changed, or learned — kind of like tracking my own changelog as I go.
 This way, anyone reading can not only see the finished project but also follow along with how it was built over time.
+
+
+4/18/25
+
+I am currently working on my first game for the platform which is Pong. 
+I had a bit of an issue with drawing things to the screen for a second there, but i got it eventually. Right this second I am working on the game loop.
+Once I am finished with this game I might work on two more before I start researching how to launch the website and continue updating it.
+This is the first website I have ever developed at all so I am unsure how updates work and how launching works. Baby steps though.
+First things first... Finish some games!

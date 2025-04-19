@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 // global variables
 const cWidth = canvas.width; // canvas width
 const cHeight = canvas.height; // canvas height
+const keys = {}; // keys object to store key strokes
 
 // game objects
 class paddlePlayer {
@@ -44,15 +45,20 @@ class paddleCPU {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
-    moveUp() {
-        if ((ball.x || ball.y) > (this.x || this.y)) {
+    update(ball, canvasHeight) {
+        const paddleCenter = this.y + this.height / 2;
+
+        if (ball.y < paddleCenter) {
             this.y -= this.speed;
-        }
-    }
-    moveDown() {
-        if ((ball.x || ball.y) < (this.x || this.y)) {
+        } else if (ball.y > this.y + this.height) {
             this.y += this.speed;
         }
+
+        if (this.y < 0) {
+            this.y = 0;
+          } else if (this.y + this.height > canvas.height) {
+            this.y = canvas.height - this.height;
+          }
     }
 }
 
@@ -63,6 +69,12 @@ class ball {
         this.width = width;
         this.height = height;
         this.color = 'white';
+        this.speed = 5;
+        this.velocityY = 5;
+    }
+    initialize() {
+        this.x = cWidth / 2 - this.width / 2; 
+        this.y = cHeight / 2 - this.height / 2;
         this.speed = 5;
     }
     draw() {
@@ -81,15 +93,61 @@ class ball {
             this.speed = -this.speed;
         }
     }
+    collisionWall(canvasHeight){
+        if (this.y <= 0) {
+            this.y = 0;
+            this.velocityY *= -1;
+          } 
+          if (this.y + this.size >= canvasHeight) {
+            this.y = canvasHeight - this.size;
+            this.velocityY *= -1;
+          }
+    }
 }
+
+window.addEventListener('keydown', (e) => {
+    keys[e.key] = true; // set key to true when pressed
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
+        e.preventDefault(); // Stop the browser from scrolling
+    }
+});
+window.addEventListener('keyup', (e) => {
+    keys[e.key] = false; // set key to true when pressed
+});
 
 const gameBall = new ball(400, 300, 10, 10);
 const player = new paddlePlayer(50, 250, 10, 100);
 const cpu = new paddleCPU(740, 250, 10, 100);
 
+function gameLoop() {
+
+    ctx.clearRect(0, 0, cWidth, cHeight);
 
 
-player.draw();
-cpu.draw();
-gameBall.draw();
+    // player movement
+    if(keys['ArrowUp']) {
+        player.moveUp();
+    }
+    if(keys['ArrowDown']) {
+        player.moveDown(cHeight);
+    }
 
+    // cpu movement
+    cpu.update(gameBall);
+
+    // ball movement and collision
+    gameBall.move();
+    if (gameBall.collision(player, cpu)){
+        gameBall.speed = -gameBall.speed;
+    }
+    gameBall.collisionWall(cHeight);
+    
+    gameBall.draw();
+    player.draw();
+    cpu.draw();
+
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
