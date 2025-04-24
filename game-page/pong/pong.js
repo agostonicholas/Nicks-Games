@@ -7,22 +7,18 @@ const cHeight = canvas.height; // canvas height
 const keys = {}; // keys object to store key strokes
 
 // game classes
-/* 
-class scoreBoard{
-    constructor(x, y, width, height) {
+class scoreCard {
+    constructor(x, y){
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
-        this.color = white;
-        this.score = 0;
-        }
-    draw() {
-
+    }
+    draw(player){
+        ctx.font = '30px "Press Start 2P"';
+        ctx.fillStyle = 'white';
+        ctx.fillText(player.toString(), this.x, this.y);
+        console.log(player.toString(), "score drawn")
     }
 }
-
-*/ 
 
 class paddlePlayer {
     constructor(x, y, width, height) {
@@ -105,17 +101,30 @@ class ball {
     }
     collision(paddlePlayer, paddleCPU) {
         if (this.x < paddlePlayer.x + paddlePlayer.width && this.x + this.width > paddlePlayer.x && this.y < paddlePlayer.y + paddlePlayer.height && this.y + this.height > paddlePlayer.y) {
-            this.speedY = -this.speedY;
             this.speedX = -this.speedX;
+
         }
         if (this.x < paddleCPU.x + paddleCPU.width && this.x + this.width > paddleCPU.x && this.y < paddleCPU.y + paddleCPU.height && this.y + this.height > paddleCPU.y) {
-            this.speedY = -this.speedY;
             this.speedX = -this.speedX;
+
         }
     }
     collisionWall(canvasHeight){
         if (this.y + this.height > canvasHeight || this.y < 0) {
             this.speedY = -this.speedY;
+        }
+    }
+    collisionPlayerGoal(score) {
+        if (this.x < 0) {
+            score++;
+            this.initialize();
+        }
+    }
+    collisionCPUGoal(score) {
+        if (this.x > 800) {
+            score++;
+            console.log(score.toString());
+            this.initialize();
         }
     }
 }
@@ -135,13 +144,17 @@ window.addEventListener('keyup', (e) => {
 const gameBall = new ball(400, 300, 10, 10);
 const player = new paddlePlayer(50, 250, 10, 100);
 const cpu = new paddleCPU(740, 250, 10, 100);
-const playerGoal = new goal(0, 0, 5, 800);
-const cpuGoal = new goal(600, 0, 5, 800);
-
+const playerScoreCard = new scoreCard(0, 0);
+const cpuScoreCard = new scoreCard(600, 600);
+let cpuScore = 0;
+let playerScore = 0;
 
 //game loop
 function gameLoop() {
-        // clear 
+    let cpuScore = 0;
+    let playerScore = 0;
+    
+        // clear
     ctx.clearRect(0, 0, cWidth, cHeight);
 
        // update
@@ -159,11 +172,14 @@ function gameLoop() {
     // ball movement and collision
     gameBall.move();
     if (gameBall.collision(player, cpu)){
-        gameBall.speed = -gameBall.speed;
+        gameBall.speedY = -gameBall.speedY;
     }
+    gameBall.collisionPlayerGoal(cpuScore);
+    gameBall.collisionCPUGoal(playerScore);
     gameBall.collisionWall(cHeight);
 
         // redraw
+    playerScoreCard.draw(playerScore);
     gameBall.draw();
     player.draw();
     cpu.draw();
