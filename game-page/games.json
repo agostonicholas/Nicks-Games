@@ -4,7 +4,7 @@
         "name": "Pongy",
         "description": "Table tennis game",
         "image": "../game-page/pong/pong-thumbnail.png",
-        "link": "../game-page/pong/pong.html"
+        "link": "../game-page/pong/Pong.html"
     },
     {
         "id": 2,

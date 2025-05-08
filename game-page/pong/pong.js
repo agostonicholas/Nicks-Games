@@ -5,6 +5,14 @@ const ctx = canvas.getContext('2d');
 const cWidth = canvas.width; // canvas width
 const cHeight = canvas.height; // canvas height
 const keys = {}; // keys object to store key strokes
+const button = {
+    x: 200,
+    y: 200,
+    width: 200,
+    height:60,
+    color: 'white',
+    text: 'Start Game'
+};
 
 // game classes
 class scoreCard {
@@ -13,7 +21,7 @@ class scoreCard {
         this.y = y;
     }
     draw(player){
-        ctx.font = '30px "Press Start 2P"';
+        ctx.font = '40px "Press Start 2P"';
         ctx.fillStyle = 'white';
         ctx.fillText(player.toString(), this.x, this.y);
         console.log(player.toString(), "score drawn")
@@ -46,7 +54,7 @@ class paddlePlayer {
 }
 
 class paddleCPU {
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, speed) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -82,14 +90,23 @@ class ball {
         this.width = width;
         this.height = height;
         this.color = 'white';
-        this.speedX = 5;
-        this.speedY = 5;
+        this.speedX = 3;
+        this.speedY = 3;
     }
     initialize() {
+        this.speedX = 3;
+        this.speedY = 3;
         this.x = cWidth / 2 - this.width / 2; 
         this.y = cHeight / 2 - this.height / 2;
-        Math.random() < 0.5 ? this.speedX = -this.speedX : this.speedX = this.speedX;
-        Math.random() < 0.5 ? this.speedY = -this.speedY : this.speedY = this.speedY;
+        
+        let angle = Math.random() > 0.5 ? Math.PI / 4 : -Math.PI / 4;
+
+        if (Math.random() < 0.5) { 
+            this.speedX = -this.speedX * Math.cos(angle);
+        }
+        if (Math.random() > 0.5){  
+            this.speedY = -this.speedY * Math.sin(angle);
+        }
     }
     draw() {
         ctx.fillStyle = this.color;
@@ -114,22 +131,43 @@ class ball {
             this.speedY = -this.speedY;
         }
     }
-    collisionPlayerGoal(score) {
+    collisionPlayerGoal() {
         if (this.x < 0) {
-            score++;
+            console.log("Score!");
             this.initialize();
+            return true;
         }
     }
-    collisionCPUGoal(score) {
+    collisionCPUGoal() {
         if (this.x > 800) {
-            score++;
-            console.log(score.toString());
+            console.log("Score!");
             this.initialize();
+            return true;
         }
     }
 }
 
+function startGame() {
+    ctx.clearRect(0, 0, cWidth, cHeight);
+    playGame = true;
+    gameLoop();
+}
+
 // keyboard checks
+window.addEventListener('click', function (e){
+    const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  if (
+    mouseX >= button.x &&
+    mouseX <= button.x + button.width &&
+    mouseY >= button.y &&
+    mouseY <= button.y + button.height
+  ) {
+    startGame();
+  }
+});
 window.addEventListener('keydown', (e) => {
     keys[e.key] = true; // set key to true when pressed
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
@@ -140,24 +178,78 @@ window.addEventListener('keyup', (e) => {
     keys[e.key] = false; // set key to true when pressed
 });
 
-// game objects
+const startCPU = new paddleCPU(50, 250, 10, 100);
+const startCPU2 = new paddleCPU(740, 250, 10, 100);
+const startBall = new ball(400, 300, 10, 10);
+let playGame = false
+
+// start game and stuff
+
+function drawButton() {
+    ctx.fillStyle = "#444";
+    ctx.fillRect(button.x, button.y, button.width, button.height);
+
+    ctx.fillStyle = "white";
+    ctx.font = "24px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(button.text, button.x + button.width / 2, button.y + button.height / 2);
+}
+
+function startScreen() {
+    if (!playGame){
+        ctx.clearRect(0, 0, cWidth, cHeight);
+
+        // update
+        for ( let i = 0; i < 10; i++){
+            ctx.fillStyle = 'white';
+            ctx.fillRect(400, 0, 5, cHeight);
+        }
+        startBall.move();
+        if (startBall.collision(startCPU, startCPU2)){
+            startBall.speedY = -gameBall.speedY;
+        }
+        if (startBall.collision(player, cpu)){
+            startBall.speedY = -startBall.speedY;
+        }
+        
+        startBall.collisionCPUGoal()
+        startBall.collisionPlayerGoal()
+        startBall.collisionWall(cHeight);
+        
+        startCPU.update(startBall);
+        startCPU2.update(startBall);
+        //render
+        startCPU.draw();
+        startCPU2.draw();
+        startBall.draw();
+
+        requestAnimationFrame(startScreen);
+    }
+}
+
 const gameBall = new ball(400, 300, 10, 10);
 const player = new paddlePlayer(50, 250, 10, 100);
 const cpu = new paddleCPU(740, 250, 10, 100);
-const playerScoreCard = new scoreCard(0, 0);
-const cpuScoreCard = new scoreCard(600, 600);
-let cpuScore = 0;
+const playerScoreCard = new scoreCard(150, 100);
+const cpuScoreCard = new scoreCard(570, 100);
+
 let playerScore = 0;
+let cpuScore = 0;
 
 //game loop
 function gameLoop() {
-    let cpuScore = 0;
-    let playerScore = 0;
+
     
         // clear
     ctx.clearRect(0, 0, cWidth, cHeight);
 
        // update
+
+    for ( let i = 0; i < 10; i++){
+        ctx.fillStyle = 'white';
+        ctx.fillRect(400, 0, 5, cHeight);
+    }
     // player movement
     if(keys['ArrowUp']) {
         player.moveUp();
@@ -174,11 +266,18 @@ function gameLoop() {
     if (gameBall.collision(player, cpu)){
         gameBall.speedY = -gameBall.speedY;
     }
-    gameBall.collisionPlayerGoal(cpuScore);
-    gameBall.collisionCPUGoal(playerScore);
+    
+    if (gameBall.collisionCPUGoal()) {
+        playerScore++;
+    }
+    if (gameBall.collisionPlayerGoal()) {
+        cpuScore++;
+    }
+
     gameBall.collisionWall(cHeight);
 
         // redraw
+    cpuScoreCard.draw(cpuScore);
     playerScoreCard.draw(playerScore);
     gameBall.draw();
     player.draw();
@@ -188,4 +287,5 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+startScreen();
+drawButton();
