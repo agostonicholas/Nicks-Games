@@ -6,8 +6,8 @@ const cWidth = canvas.width; // canvas width
 const cHeight = canvas.height; // canvas height
 const keys = {}; // keys object to store key strokes
 const button = {
-    x: 200,
-    y: 200,
+    x: 300,
+    y: 500,
     width: 200,
     height:60,
     color: 'white',
@@ -36,6 +36,9 @@ class paddlePlayer {
         this.height = height;
         this.color = 'white';
         this.speed = 5;
+        this.center = this.y + this.height / 2;
+        this.bottom = this.y + this.height;
+        this.top = this.y;
     }
     draw() {
         ctx.fillStyle = this.color;
@@ -60,13 +63,16 @@ class paddleCPU {
         this.width = width;
         this.height = height;
         this.color = 'white';
-        this.speed = 5;
+        this.speed = 3;
+        this.center = this.y + this.height / 2;
+        this.bottom = this.y + this.height;
+        this.top = this.y;
     }
     draw() {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
-    update(ball, canvasHeight) {
+    update(ball) {
         const paddleCenter = this.y + this.height / 2;
 
         if (ball.y < paddleCenter) {
@@ -117,12 +123,41 @@ class ball {
         this.y += this.speedY;
     }
     collision(paddlePlayer, paddleCPU) {
-        if (this.x < paddlePlayer.x + paddlePlayer.width && this.x + this.width > paddlePlayer.x && this.y < paddlePlayer.y + paddlePlayer.height && this.y + this.height > paddlePlayer.y) {
-            this.speedX = -this.speedX;
+        if (this.x < paddlePlayer.x + paddlePlayer.width && 
+            this.x + this.width > paddlePlayer.x && 
+            this.y < paddlePlayer.y + paddlePlayer.height && 
+            this.y + this.height > paddlePlayer.y) {
 
+                let paddleCenter = paddlePlayer.y + paddlePlayer.height / 2;
+                let distanceFromCenter = this.y - paddleCenter;
+                let normalizedSpeed = distanceFromCenter / (paddlePlayer.height / 2);
+                let angle = normalizedSpeed * (Math.PI / 4);
+                let speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2);
+
+                this.speedX = Math.abs(speed * Math.cos(angle)); // Ensure ball goes right
+                this.speedY = speed * Math.sin(angle);
+
+                if (this.speedX < 6) {
+                    this.speedX *= 1.1;
+                }
         }
-        if (this.x < paddleCPU.x + paddleCPU.width && this.x + this.width > paddleCPU.x && this.y < paddleCPU.y + paddleCPU.height && this.y + this.height > paddleCPU.y) {
-            this.speedX = -this.speedX;
+        if (this.x < paddleCPU.x + paddleCPU.width && 
+            this.x + this.width > paddleCPU.x && 
+            this.y < paddleCPU.y + paddleCPU.height && 
+            this.y + this.height > paddleCPU.y) {
+            
+                let paddleCenter = paddleCPU.y + paddleCPU.height / 2;
+                let distanceFromCenter = this.y - paddleCenter;
+                let normalizedSpeed = distanceFromCenter / (paddleCPU.height / 2);
+                let angle = normalizedSpeed * (Math.PI / 4);
+                let speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2);
+        
+                this.speedX = -Math.abs(speed * Math.cos(angle)); // Ensure ball goes left
+                this.speedY = speed * Math.sin(angle);
+        
+                if (Math.abs(this.speedX) < 6) {
+                    this.speedX *= 1.1;
+                }
 
         }
     }
@@ -198,6 +233,8 @@ function drawButton() {
 
 function startScreen() {
     if (!playGame){
+
+        drawButton();
         ctx.clearRect(0, 0, cWidth, cHeight);
 
         // update
@@ -223,6 +260,7 @@ function startScreen() {
         startCPU.draw();
         startCPU2.draw();
         startBall.draw();
+        drawButton();
 
         requestAnimationFrame(startScreen);
     }
@@ -263,9 +301,7 @@ function gameLoop() {
 
     // ball movement and collision
     gameBall.move();
-    if (gameBall.collision(player, cpu)){
-        gameBall.speedY = -gameBall.speedY;
-    }
+    gameBall.collision(player, cpu)
     
     if (gameBall.collisionCPUGoal()) {
         playerScore++;
@@ -273,8 +309,17 @@ function gameLoop() {
     if (gameBall.collisionPlayerGoal()) {
         cpuScore++;
     }
-
     gameBall.collisionWall(cHeight);
+
+    if (playerScore == 10) {
+        console.log("Player win!");
+        ctx.font = '40 px "Press Start 2P"';
+        ctx.fillStyle = 'lime';
+        ctx.fillText("You win!", 400, 400);
+        if (player.moveUp || player.moveDown){
+            playGame = false;
+        }
+    }
 
         // redraw
     cpuScoreCard.draw(cpuScore);
@@ -288,4 +333,3 @@ function gameLoop() {
 }
 
 startScreen();
-drawButton();
