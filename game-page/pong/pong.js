@@ -229,12 +229,12 @@ function drawButton() {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(button.text, button.x + button.width / 2, button.y + button.height / 2);
+    console.log("Button Drawn")
 }
 
 function startScreen() {
     if (!playGame){
 
-        drawButton();
         ctx.clearRect(0, 0, cWidth, cHeight);
 
         // update
@@ -278,7 +278,7 @@ let cpuScore = 0;
 //game loop
 function gameLoop() {
 
-    
+    if (playGame == true){
         // clear
     ctx.clearRect(0, 0, cWidth, cHeight);
 
@@ -311,14 +311,19 @@ function gameLoop() {
     }
     gameBall.collisionWall(cHeight);
 
-    if (playerScore == 10) {
+    if (playerScore >= 10) {
         console.log("Player win!");
         ctx.font = '40 px "Press Start 2P"';
         ctx.fillStyle = 'lime';
-        ctx.fillText("You win!", 400, 400);
-        if (player.moveUp || player.moveDown){
-            playGame = false;
-        }
+        ctx.fillText("You win!", 425, 400);
+        playGame = false;
+    }
+    if (cpuScore >= 10) {
+        console.log("CPU win!");
+        ctx.font = '40 px "Press Start 2P"';
+        ctx.fillStyle = 'lime';
+        ctx.fillText("RIP BOZO", 425, 400);
+        playGame = false;
     }
 
         // redraw
@@ -330,6 +335,7 @@ function gameLoop() {
 
 
     requestAnimationFrame(gameLoop);
+    }
 }
 
 startScreen();

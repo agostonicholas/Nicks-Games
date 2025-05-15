@@ -8,10 +8,10 @@
     },
     {
         "id": 2,
-        "name": "Game 2",
-        "description": "Description for Game 2",
-        "image": "",
-        "link": ""
+        "name": "Brick Breaker",
+        "description": "Break the bricks with the ball to score points!",
+        "image": "../game-page/brick-breaker/brick-breaker.png",
+        "link": "../game-page/brick-breaker/brick-breaker.html"
     },
     {
         "id": 3,

@@ -54,10 +54,25 @@ body {
     color: lime;
   }
 
-  .game-canvas{
-    display: block;
-    margin: 40px auto;
+  .game {
+    margin-top: 20px;
+    margin-left: 525px;
+  }
+  
+  .game-canvas {
     border: 5px solid lime;
+    display: inline-block;
+    vertical-align: top;
+    
+  }
+  
+  .game-details {
+    display: inline-block;
+    vertical-align: top;
+    color: lime;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    max-width: 400px;
   }
 
   /* animations */
