@@ -4,7 +4,7 @@ fetch("../game-page/games.json")
     games.forEach(game => {
       const gameCard = document.createElement("div");
       gameCard.classList.add("game-card");
-      let imageHTML = game.image ? `<a href= ${game.link}><img src="${game.image}" alt="${game.name}"height= 200px width= 150px></a>` : "";
+      let imageHTML = game.image ? `<a href= ${game.link}></a><img src="${game.image}" alt="${game.name}"height= 200px width= 150px>` : "";
       gameCard.innerHTML = `
         ${imageHTML}
         <h3>${game.name}</h3>
