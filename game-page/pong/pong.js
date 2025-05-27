@@ -280,61 +280,61 @@ function gameLoop() {
 
     if (playGame == true){
         // clear
-    ctx.clearRect(0, 0, cWidth, cHeight);
+        ctx.clearRect(0, 0, cWidth, cHeight);
 
        // update
 
-    for ( let i = 0; i < 10; i++){
+        for ( let i = 0; i < 10; i++){
         ctx.fillStyle = 'white';
         ctx.fillRect(400, 0, 5, cHeight);
-    }
-    // player movement
-    if(keys['ArrowUp']) {
-        player.moveUp();
-    }
-    if(keys['ArrowDown']) {
-        player.moveDown(cHeight);
-    }
+        }
+        // player movement
+        if(keys['ArrowUp']) {
+            player.moveUp();
+        }
+        if(keys['ArrowDown']) {
+            player.moveDown(cHeight);
+        }
 
-    // cpu movement
-    cpu.update(gameBall);
+        // cpu movement
+        cpu.update(gameBall);
 
-    // ball movement and collision
-    gameBall.move();
-    gameBall.collision(player, cpu)
+        // ball movement and collision
+        gameBall.move();
+        gameBall.collision(player, cpu)
     
-    if (gameBall.collisionCPUGoal()) {
-        playerScore++;
-    }
-    if (gameBall.collisionPlayerGoal()) {
-        cpuScore++;
-    }
-    gameBall.collisionWall(cHeight);
+        if (gameBall.collisionCPUGoal()) {
+            playerScore++;
+        }
+        if (gameBall.collisionPlayerGoal()) {
+            cpuScore++;
+        }
+        gameBall.collisionWall(cHeight);
 
-    if (playerScore >= 10) {
-        console.log("Player win!");
-        ctx.font = '40 px "Press Start 2P"';
-        ctx.fillStyle = 'lime';
-        ctx.fillText("You win!", 425, 400);
-        playGame = false;
-    }
-    if (cpuScore >= 10) {
-        console.log("CPU win!");
-        ctx.font = '40 px "Press Start 2P"';
-        ctx.fillStyle = 'lime';
-        ctx.fillText("RIP BOZO", 425, 400);
-        playGame = false;
-    }
+        if (playerScore >= 10) {
+            console.log("Player win!");
+            ctx.font = '40 px "Press Start 2P"';
+            ctx.fillStyle = 'lime';
+            ctx.fillText("You win!", 425, 400);
+            playGame = false;
+        }
+        if (cpuScore >= 10) {
+            console.log("CPU win!");
+            ctx.font = '40 px "Press Start 2P"';
+            ctx.fillStyle = 'lime';
+            ctx.fillText("RIP BOZO", 425, 400);
+            playGame = false;
+        }
 
-        // redraw
-    cpuScoreCard.draw(cpuScore);
-    playerScoreCard.draw(playerScore);
-    gameBall.draw();
-    player.draw();
-    cpu.draw();
+            // redraw
+        cpuScoreCard.draw(cpuScore);
+        playerScoreCard.draw(playerScore);
+        gameBall.draw();
+        player.draw();
+        cpu.draw();
 
 
-    requestAnimationFrame(gameLoop);
+        requestAnimationFrame(gameLoop);
     }
 }
 
