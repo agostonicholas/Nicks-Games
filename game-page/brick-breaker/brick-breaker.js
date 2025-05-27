@@ -53,7 +53,6 @@ class ball {
         this.y = paddleCenter + 50;
         this.speedX = 0;
         this.speedY = 0;
-        shoot();
     }
 
     draw() {
@@ -67,18 +66,15 @@ class ball {
             this.y < paddlePlayer.y + paddlePlayer.height && 
             this.y + this.height > paddlePlayer.y) {
 
-                let paddleCenter = paddlePlayer.y + paddlePlayer.height / 2;
-                let distanceFromCenter = this.y - paddleCenter;
-                let normalizedSpeed = distanceFromCenter / (paddlePlayer.height / 2);
-                let angle = normalizedSpeed * (Math.PI / 4);
-                let speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2);
+                let hitPos = ((this.x + this.width / 2) - (paddlePlayer.x + paddlePlayer.width / 2)) / (paddlePlayer.width / 2);
+                let maxBounce = Math.PI / 3;
+                let angle = hitPos * maxBounce;
+                let speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2) || 5;
 
-                this.speedX = Math.abs(speed * Math.cos(angle)); // Ensure ball goes right
-                this.speedY = speed * Math.sin(angle);
+                this.speedX = speed * Math.sin(angle); // Ensure ball goes right
+                this.speedY = -Math.abs(speed * Math.cos(angle));
 
-                if (this.speedX < 6) {
-                    this.speedX *= 1.1;
-                }
+                this.y = paddlePlayer.y - this.height - 1;
         }
     }
     
@@ -89,12 +85,6 @@ class ball {
         if (this.x + this.width > canvasWidth || this.x < 0) {
             this.speedX = -this.speedX;
         }
-    }
-}
-
-function shoot(){
-    if (keys['ArrowUp']){
-        ball.speedX = 5;
     }
 }
 
@@ -110,22 +100,54 @@ window.addEventListener('keyup', (e) => {
 
 paddlePlayer = new paddle(400, 550, 100, 10);
 gameBall = new ball(450, 450, 10, 10);
+let ballIsReady = true;
+let ballsLeft = 3;
+youLose = false;
+
+gameBall.initialize(paddlePlayer);
+
+function gameOver(){
+    if(youLose = true){
+        ctx.clearRect(0, 0, cWidth, cHeight);
+        gameLoop();
+    }
+}
 
 function gameLoop() {
         //clear
     ctx.clearRect(0, 0, cWidth, cHeight);
         //update
+    if(ballsLeft == 0){
+        gameOver = true;
+    }
+
+    if(gameBall.y > (paddlePlayer.y + 20)){
+        ballsLeft -= 1;
+        ballIsReady = true;
+    }
+
+    if(ballIsReady){
+        gameBall.x = paddlePlayer.x + paddlePlayer.width / 2 - gameBall.width / 2;
+        gameBall.y = paddlePlayer.y - gameBall.height - 2;
+        if(keys['ArrowUp'] || keys[' ']) {
+            gameBall.speedX = 0;
+            gameBall.speedY = -5;
+            ballIsReady = false
+        }
+    } else {
+        gameBall.x += gameBall.speedX;
+        gameBall.y += gameBall.speedY;
         gameBall.collision(paddlePlayer);
         gameBall.collisionWall(cHeight, cWidth);
-        if(gameBall.initialize() == true)
-            gameBall.move();
+    }
 
-        if (keys['ArrowLeft']){
-            paddlePlayer.moveLeft();
-        }
-        if (keys['ArrowRight']){
-            paddlePlayer.moveRight(cWidth);
-        }
+    if(gameBall.y > cHeight){
+        gameBall.initialize(paddlePlayer);
+        ballIsReady = true;
+    }
+
+    if (keys['ArrowLeft']) paddlePlayer.moveLeft();
+    if (keys['ArrowRight']) paddlePlayer.moveRight(cWidth);
         //render
     paddlePlayer.draw();
     gameBall.draw();
