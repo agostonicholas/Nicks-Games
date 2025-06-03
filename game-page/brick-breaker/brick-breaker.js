@@ -9,36 +9,16 @@ const brickColors = ['blue', 'red', 'green', 'yellow', 'orange']
 
 class scoreboard{
     constructor(x, y, score){
-        
-    }
-}
-
-
-class brick {
-    constructor(x, y, colorIndex){
         this.x = x;
         this.y = y;
-        this.length = 30;
-        this.width = 10;
-        this.colorIndex = colorIndex;
-        this.color = brickColors[this.colorIndex]
+        this.score = score;
     }
-    
-    draw(){
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.length, this.width);
+    draw(player){
+        ctx.fillStyle = 'white';
+        ctx.font = '20px "Press Start 2P"';
+        ctx.fillText(`P1 ${player}`, this.x, this.y);
     }
-    
-    downgradeColor() {
-        this.colorIndex--;
-        if (this.colorIndex >= 0) {
-            this.color = brickColors[this.colorIndex];
-        }
-    }
-
 }
-
-
 
 class paddle {
     constructor(x, y, width, height) {
@@ -72,13 +52,13 @@ class ball {
         this.width = width;
         this.height = height;
         this.color = "green";
-        this.speedX = 5;
-        this.speedY = 5;
+        this.speedX = 1;
+        this.speedY = 1;
     }
 
     move(){
-        this.speedX = 5;
-        this.speedY = 5;
+        this.speedX = 1;
+        this.speedY = 1;
     }
 
     initialize(paddlePlayer){
@@ -111,24 +91,6 @@ class ball {
                 this.y = paddlePlayer.y - this.height - 1;
         }
     }
-
-    collisionBrick(brick) {
-        if (this.x < brick.x + brick.width && 
-            this.x + this.width > brick.x && 
-            this.y < brick.y + brick.height && 
-            this.y + this.height > brick.y) {
-
-                let hitPos = ((this.x + this.width / 2) - (brick.x + brick.width / 2)) / (brick.width / 2);
-                let maxBounce = Math.PI / 3;
-                let angle = hitPos * maxBounce;
-                let speed = Math.sqrt(this.speedX ** 2 + this.speedY ** 2) || 5;
-
-                this.speedX = speed * Math.sin(angle); // Ensure ball goes right
-                this.speedY = -Math.abs(speed * Math.cos(angle));
-
-                this.y = brick.y - this.height - 1;
-        }
-    }
     
     collisionWall(canvasHeight, canvasWidth){
         if (this.y + this.height > canvasHeight || this.y < 0) {
@@ -150,33 +112,51 @@ window.addEventListener('keyup', (e) => {
     keys[e.key] = false; // set key to true when pressed
 });
 
-paddlePlayer = new paddle(400, 550, 100, 10);
-gameBall = new ball(450, 450, 10, 10);
+let score = 0;
+let paddlePlayer = new paddle(400, 550, 100, 10);
+let gameBall = new ball(450, 450, 10, 10);
+let playerScore = new scoreboard(50, 37, score);
 let ballIsReady = true;
 let ballsLeft = 3;
-youLose = false;
-score = 0;
+let gameOver = false;
 
 gameBall.initialize(paddlePlayer);
 
-function gameOver(){
-    if(youLose = true){
-        ctx.clearRect(0, 0, cWidth, cHeight);
-        gameLoop();
-    }
-}
+// bricks 
 
-
-
-let brickRows = 5;
-let brickCols = 8;
-let brickWidth = 80;
-let brickHeight = 30;
+let brickRows = 10;
+let brickCols = 19;
+let brickWidth = 30;
+let brickHeight = 10;
 let brickPadding = 10;
 let brickOffsetTop = 50;
 let brickOffsetLeft = 35;
 
 let bricksArray = [];
+
+class brick {
+    constructor(x, y, colorIndex){
+        this.x = x;
+        this.y = y;
+        this.height = brickHeight;
+        this.width = brickWidth;
+        this.colorIndex = colorIndex;
+        this.color = brickColors[this.colorIndex]
+    }
+    
+    draw(){
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    
+    downgradeColor() {
+        this.colorIndex--;
+        if (this.colorIndex >= 0) {
+            this.color = brickColors[this.colorIndex];
+        }
+    }
+
+}
 
 for (let row = 0; row < brickRows; row++){
     for (let col = 0; col < brickCols; col++){
@@ -188,75 +168,95 @@ for (let row = 0; row < brickRows; row++){
 }
 
 function gameLoop() {
+        
         //clear
-    ctx.clearRect(0, 0, cWidth, cHeight);
-        //update
-    if(ballsLeft == 0){
+
+    if (gameOver){
+        ctx.clearRect(0, 0, cWidth, cHeight);
+        ctx.fillStyle = 'white';
+        ctx.font = '40px "Press Start 2P"'
+        ctx.fillText(`RIP BOZO P1${score}`);
+        requestAnimationFrame(gameLoop);
+    }
+    if(ballsLeft == 0){ // game over condition
         gameOver = true;
+        return;
     }
+    if (!gameOver){
+        ctx.clearRect(0, 0, cWidth, cHeight);
 
-    if(gameBall.y > (paddlePlayer.y + 20)){
-        ballsLeft -= 1;
-        ballIsReady = true;
-    }
+            //update
 
-    if(ballIsReady){
-        gameBall.x = paddlePlayer.x + paddlePlayer.width / 2 - gameBall.width / 2;
-        gameBall.y = paddlePlayer.y - gameBall.height - 2;
-        if(keys['ArrowUp'] || keys[' ']) {
-            gameBall.speedX = 0;
-            gameBall.speedY = -5;
-            ballIsReady = false
+        if(gameBall.y > (paddlePlayer.y + 20)){ // ball is dead
+            ballsLeft -= 1;
+            ballIsReady = true;
         }
-    } else {
-        gameBall.x += gameBall.speedX;
-        gameBall.y += gameBall.speedY;
-        gameBall.collision(paddlePlayer);
-        gameBall.collisionWall(cHeight, cWidth);
 
-        for (let i = bricksArray.length - 1; i >= 0; i--) {
-            let b = bricksArray[i];
-            gameBall.collisionBrick(b);
+        if(ballIsReady){ // ball is being positioned and shot
+            gameBall.x = paddlePlayer.x + paddlePlayer.width / 2 - gameBall.width / 2;
+            gameBall.y = paddlePlayer.y - gameBall.height - 2;
+            ctx.fillStyle = 'white';
+            ctx.font = '20px "Press Start 2P"';
+            ctx.fillText('Press up arrow or space to fire!', 90, 450);
+            if(keys['ArrowUp'] || keys[' ']) {
+                gameBall.speedX = 0;
+                gameBall.speedY = -5;
+                ballIsReady = false
+            }
+        } else { // ball is in motion
+            gameBall.x += gameBall.speedX;
+            gameBall.y += gameBall.speedY;
+            gameBall.collision(paddlePlayer);
+            gameBall.collisionWall(cHeight, cWidth);
 
-            if (
-                gameBall.x < b.x + b.length &&
-                gameBall.x + gameBall.width > b.x &&
-                gameBall.y < b.y + b.width &&
-                gameBall.y + gameBall.height > b.y
-                ) {
-                if(b.colorIndex > 0){
-                    b.downgradeColor();
+            for (let i = bricksArray.length - 1; i >= 0; i--) { // try to ensure one collision per brick hit 
+                let b = bricksArray[i];
+
+                if ( // logic for bounce and downgrading brick colors
+                    gameBall.x < b.x + b.width &&
+                    gameBall.x + gameBall.width > b.x &&
+                    gameBall.y < b.y + b.height &&
+                    gameBall.y + gameBall.height > b.y
+                    ) {
+                    if(b.colorIndex > 0){
+                        b.downgradeColor();
+                    } else {
+                        bricksArray.splice(i, 1);
+                    }
                     gameBall.speedY = -gameBall.speedY;
                     score += 10;
-                } else {
-                    bricksArray.splice(i, 1);
-                    gameBall.speedY = -gameBall.speedY;
-                    score += 10;
+                    break;
                 }
             }
+            if(bricksArray.length == 0){ // reset the ball on grid clear
+                ballIsReady = true
+            }
         }
-        if(bricksArray.length == 0){
-            ballIsReady = true
+
+        if(gameBall.y > cHeight){
+            gameBall.initialize(paddlePlayer);
+            ballIsReady = true;
         }
+
+        if (keys['ArrowLeft']) paddlePlayer.moveLeft(); // movement logic left
+        if (keys['ArrowRight']) paddlePlayer.moveRight(cWidth); // movement right
+
+            //render
+        
+            for (let b of bricksArray){
+            b.draw();
+        }
+
+        ctx.fillStyle = 'white';
+        ctx.font = '20px "Press Start 2P"';
+        ctx.fillText(`Balls ${ballsLeft}`, 650, 37);
+
+        playerScore.draw(score);
+        paddlePlayer.draw();
+        gameBall.draw();
+
+        requestAnimationFrame(gameLoop);
     }
-
-    if(gameBall.y > cHeight){
-        gameBall.initialize(paddlePlayer);
-        ballIsReady = true;
-    }
-
-    
-
-    if (keys['ArrowLeft']) paddlePlayer.moveLeft();
-    if (keys['ArrowRight']) paddlePlayer.moveRight(cWidth);
-        //render
-    for (let b of bricksArray){
-        b.draw();
-    }
-    paddlePlayer.draw();
-    gameBall.draw();
-
-    requestAnimationFrame(gameLoop);
 }
 
 gameLoop();

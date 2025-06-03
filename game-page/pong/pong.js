@@ -24,7 +24,7 @@ class scoreCard {
         ctx.font = '40px "Press Start 2P"';
         ctx.fillStyle = 'white';
         ctx.fillText(player.toString(), this.x, this.y);
-        console.log(player.toString(), "score drawn")
+        console.log(player.toString(), "score drawn");
     }
 }
 
