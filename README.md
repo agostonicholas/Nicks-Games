@@ -38,3 +38,9 @@ I had a bit of an issue with drawing things to the screen for a second there, bu
 Once I am finished with this game I might work on two more before I start researching how to launch the website and continue updating it.
 This is the first website I have ever developed at all so I am unsure how updates work and how launching works. Baby steps though.
 First things first... Finish some games!
+
+6/01/25
+
+I just finished the Pong game and I’m nearly done with Brick Breaker. The ball bouncing off the bricks was tricky to get right — the collision logic gave me some trouble — but I managed to figure it out in the end. After this, I’d like to build at least one more game before I officially launch the site online.
+
+I’ve also been thinking ahead about backend development. Eventually, I want to add a login system to track player progress and scores across games. That’s still a ways off, but it’s on the roadmap.
