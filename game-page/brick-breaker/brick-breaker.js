@@ -119,6 +119,10 @@ let playerScore = new scoreboard(50, 37, score);
 let ballIsReady = true;
 let ballsLeft = 3;
 let gameOver = false;
+let gameOverDelay = false;
+const collisionSound = new Audio("sounds/bounce.mp3");
+const deathSound = new Audio("sounds/explosion.mp3");
+const gameOverSound = new Audio("sounds/game-over.mp3");
 
 gameBall.initialize(paddlePlayer);
 
@@ -170,24 +174,47 @@ for (let row = 0; row < brickRows; row++){
 function gameLoop() {
         
         //clear
-
+    if(ballsLeft == 0){ // game over condition
+        gameOver = true;
+    }
     if (gameOver){
         ctx.clearRect(0, 0, cWidth, cHeight);
         ctx.fillStyle = 'white';
         ctx.font = '40px "Press Start 2P"'
-        ctx.fillText(`RIP BOZO P1${score}`);
+        ctx.fillText('RIP BOZO', 250, cHeight / 2);
+        ctx.fillText(`P1 ${score}`, 250, 355)
+        if(!gameOverDelay){
+            gameOverDelay = true;
+            gameOverSound.play();
+            setTimeout(() => {
+                score = 0;
+                ballsLeft = 3;
+                ballIsReady = true;
+                gameOver = false;
+                gameOverDelay = false;
+
+                bricksArray = [];
+                for (let row = 0; row < brickRows; row++) {
+                    for (let col = 0; col < brickCols; col++) {
+                        let colorIndex = Math.floor(Math.random() * brickColors.length);
+                        let x = brickOffsetLeft + col * (brickWidth + brickPadding);
+                        let y = brickOffsetTop + row * (brickHeight + brickPadding);
+                        bricksArray.push(new brick(x, y, colorIndex));
+                    }
+                }
+            }, 5000);
+        }
         requestAnimationFrame(gameLoop);
-    }
-    if(ballsLeft == 0){ // game over condition
-        gameOver = true;
         return;
     }
+    
     if (!gameOver){
         ctx.clearRect(0, 0, cWidth, cHeight);
 
             //update
 
         if(gameBall.y > (paddlePlayer.y + 20)){ // ball is dead
+            deathSound.play();
             ballsLeft -= 1;
             ballIsReady = true;
         }
@@ -223,6 +250,8 @@ function gameLoop() {
                     } else {
                         bricksArray.splice(i, 1);
                     }
+                    collisionSound.currentTime = 0;
+                    collisionSound.play();
                     gameBall.speedY = -gameBall.speedY;
                     score += 10;
                     break;

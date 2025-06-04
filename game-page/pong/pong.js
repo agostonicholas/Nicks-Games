@@ -5,6 +5,8 @@ const ctx = canvas.getContext('2d');
 const cWidth = canvas.width; // canvas width
 const cHeight = canvas.height; // canvas height
 const keys = {}; // keys object to store key strokes
+const hitSound = new Audio("sounds/bounce.mp3");
+const goalSound = new Audio("sounds/explosion.mp3");
 const button = {
     x: 300,
     y: 500,
@@ -136,9 +138,12 @@ class ball {
 
                 this.speedX = Math.abs(speed * Math.cos(angle)); // Ensure ball goes right
                 this.speedY = speed * Math.sin(angle);
+                hitSound.currentTime = 0;
+                hitSound.play();
 
                 if (this.speedX < 6) {
                     this.speedX *= 1.1;
+                    
                 }
         }
         if (this.x < paddleCPU.x + paddleCPU.width && 
@@ -154,6 +159,8 @@ class ball {
         
                 this.speedX = -Math.abs(speed * Math.cos(angle)); // Ensure ball goes left
                 this.speedY = speed * Math.sin(angle);
+                hitSound.currentTime = 0;
+                hitSound.play();
         
                 if (Math.abs(this.speedX) < 6) {
                     this.speedX *= 1.1;
@@ -164,10 +171,13 @@ class ball {
     collisionWall(canvasHeight){
         if (this.y + this.height > canvasHeight || this.y < 0) {
             this.speedY = -this.speedY;
+            hitSound.currentTime = 0;
+            hitSound.play();
         }
     }
     collisionPlayerGoal() {
         if (this.x < 0) {
+            goalSound.play();
             console.log("Score!");
             this.initialize();
             return true;
@@ -175,6 +185,7 @@ class ball {
     }
     collisionCPUGoal() {
         if (this.x > 800) {
+            goalSound.play();
             console.log("Score!");
             this.initialize();
             return true;
@@ -278,6 +289,29 @@ let cpuScore = 0;
 //game loop
 function gameLoop() {
 
+    if (playerScore >= 10) {
+        playGame = false;
+        console.log("Player win!");
+        ctx.font = '40 px "Press Start 2P"';
+        ctx.fillStyle = 'lime';
+        ctx.fillText("You Win!", 425, 400);    
+        setTimeout(() => {
+            startScreen();
+        }, 5000)
+        return;
+        }
+    if (cpuScore >= 10) {
+        playGame = false;
+        console.log("CPU win!");
+        ctx.font = '40 px "Press Start 2P"';
+        ctx.fillStyle = 'lime';
+        ctx.fillText("RIP BOZO", 425, 400);
+        setTimeout(() => {
+            startScreen();
+        }, 5000)
+        return;
+    }
+
     if (playGame == true){
         // clear
         ctx.clearRect(0, 0, cWidth, cHeight);
@@ -301,7 +335,7 @@ function gameLoop() {
 
         // ball movement and collision
         gameBall.move();
-        gameBall.collision(player, cpu)
+        gameBall.collision(player, cpu);
     
         if (gameBall.collisionCPUGoal()) {
             playerScore++;
@@ -310,21 +344,6 @@ function gameLoop() {
             cpuScore++;
         }
         gameBall.collisionWall(cHeight);
-
-        if (playerScore >= 10) {
-            console.log("Player win!");
-            ctx.font = '40 px "Press Start 2P"';
-            ctx.fillStyle = 'lime';
-            ctx.fillText("You win!", 425, 400);
-            playGame = false;
-        }
-        if (cpuScore >= 10) {
-            console.log("CPU win!");
-            ctx.font = '40 px "Press Start 2P"';
-            ctx.fillStyle = 'lime';
-            ctx.fillText("RIP BOZO", 425, 400);
-            playGame = false;
-        }
 
             // redraw
         cpuScoreCard.draw(cpuScore);
