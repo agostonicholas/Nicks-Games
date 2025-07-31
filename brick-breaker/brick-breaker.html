@@ -4,25 +4,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../main-page/style.css">
+    <link rel="stylesheet" href="../style.css">
     <title>Nicks Games</title>
   </head>
   <body>
     <header class= "main-title">
-      <img class="logo" src="../../main-page/nicks-games-logo.png" style="display: block; margin: 0" alt="Logo" height="100" width="100">
+      <img class="logo" src="../nicks-games-logo.png" style="display: block; margin: 0" alt="Logo" height="100" width="100">
       <h1>Nick's Games</h1>
       <nav class="nav-bar">
-        <a href="../../main-page/index.html">Home</a>
-        <a href="../../main-page/contact.html">Contact</a>
+        <a href="../index.html">Home</a>
+        <a href="../contact.html">Contact</a>
       </nav>
     </header>
     <!--this is meant to be copy pastable for every game-->
     <main>
         <!--canvas for the game screen-->
         <!--script for pulling game details-->
-        <canvas id= "game-canvas" width="800" height="600"></canvas>
-        <div class= "game-details"></div>
-        <script src="../../game-page/game-page.js"></script>
+        <div class= "game"> 
+          <canvas class="game-canvas" id= "game-canvas" width="800" height="600"></canvas>
+          <div class= "game-details">
+            <script src="brick-breaker.js"></script>
+          </div>
+          <script src="../game-page.js"></script>
+        </div>
       </div>
     </main>
   </body>

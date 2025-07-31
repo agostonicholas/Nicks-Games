@@ -1,4 +1,4 @@
-fetch("../game-page/games.json")
+fetch("games.json")
   .then(response => response.json())
   .then(games => {
     games.forEach(game => {

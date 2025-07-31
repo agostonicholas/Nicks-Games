@@ -1,6 +1,6 @@
 // script to fetch the game details and display them on the page
 
-fetch("../games.json")
+fetch("games.json")
   .then(response => response.json())
   .then(games => {
     // Get the game ID from the URL

@@ -3,15 +3,15 @@
         "id": 1,
         "name": "Pongy",
         "description": "Table tennis game",
-        "image": "../game-page/pong/pong-thumbnail.png",
-        "link": "../game-page/pong/Pong.html"
+        "image": "pong/pong-thumbnail.png",
+        "link": "pong/Pong.html"
     },
     {
         "id": 2,
         "name": "Brick Breaker",
         "description": "Break the bricks with the ball to score points!",
-        "image": "../game-page/brick-breaker/brick-breaker.png",
-        "link": "../game-page/brick-breaker/brick-breaker.html"
+        "image": "brick-breaker/brick-breaker.png",
+        "link": "brick-breaker/brick-breaker.html"
     },
     {
         "id": 3,
