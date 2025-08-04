@@ -15,10 +15,10 @@
     },
     {
         "id": 3,
-        "name": "Game 3",
-        "description": "Description for Game 3",
-        "image": "",
-        "link": ""
+        "name": "Minesweeper",
+        "description": "Clear the mines without detonating them!",
+        "image": "minesweeper/minesweeper.png",
+        "link": "minesweeper/minesweeper.html"
     },
     {
         "id": 4,
