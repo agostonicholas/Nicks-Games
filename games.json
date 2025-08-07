@@ -12,19 +12,5 @@
         "description": "Break the bricks with the ball to score points!",
         "image": "brick-breaker/brick-breaker.png",
         "link": "brick-breaker/brick-breaker.html"
-    },
-    {
-        "id": 3,
-        "name": "Game 3",
-        "description": "Description for Game 3",
-        "image": "",
-        "link": ""
-    },
-    {
-        "id": 4,
-        "name": "Game 4",
-        "description": "Description for Game 4",
-        "image": "",
-        "link": ""
     }
 ]
