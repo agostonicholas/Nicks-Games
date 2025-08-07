@@ -1,3 +1,4 @@
+import { saveScore, getLeaderboard } from '../backend-functions.js';
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
@@ -178,6 +179,7 @@ function gameLoop() {
         gameOver = true;
     }
     if (gameOver){
+        saveScore('brick-breaker', 'Player1', score);
         ctx.clearRect(0, 0, cWidth, cHeight);
         ctx.fillStyle = 'white';
         ctx.font = '40px "Press Start 2P"'
