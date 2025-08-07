@@ -4,7 +4,7 @@ const message = document.getElementById('login-message');
 const savedUsername = localStorage.getItem('username');
 if (savedUsername) {
     form.style.display = 'none';
-    message.textContent = `Logged in as ${savedUsername}`;
+    message.textContent = `${savedUsername}`;
 } else {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
