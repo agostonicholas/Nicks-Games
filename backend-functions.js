@@ -1,6 +1,6 @@
 export async function saveScore(game, user, score){
     try {
-        const response = await fetch('https://nicks-games-backend.onrender.com/saveScore', {
+        const response = await fetch('https://nicks-games-backend.onrender.com/api/save-score', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ game, user, score })
@@ -14,7 +14,7 @@ export async function saveScore(game, user, score){
 
 export async function getLeaderboard(){
     try {
-        const response = await fetch('https://nicks-games-backend.onrender.com/getLeaderboard', {
+        const response = await fetch('https://nicks-games-backend.onrender.com/api/getLeaderboard', {
             method: 'GET',
             headers: {'Content-Type': 'application/json'},
         });

@@ -7,6 +7,7 @@ const cWidth = canvas.width; // canvas width
 const cHeight = canvas.height; // canvas height
 const keys = {}; // keys object to store key strokes
 const brickColors = ['blue', 'red', 'green', 'yellow', 'orange']
+const user = localStorage.getItem('username') || 'BOZO'; // get username from localStorage or default to 'Bozo'
 
 class scoreboard{
     constructor(x, y, score){
@@ -17,7 +18,7 @@ class scoreboard{
     draw(player){
         ctx.fillStyle = 'white';
         ctx.font = '20px "Press Start 2P"';
-        ctx.fillText(`P1 ${player}`, this.x, this.y);
+        ctx.fillText(`${user} ${player}`, this.x, this.y);
     }
 }
 
@@ -179,11 +180,11 @@ function gameLoop() {
         gameOver = true;
     }
     if (gameOver){
-        saveScore('brick-breaker', 'Player1', score);
+        saveScore('brick-breaker', user, score);
         ctx.clearRect(0, 0, cWidth, cHeight);
         ctx.fillStyle = 'white';
         ctx.font = '40px "Press Start 2P"'
-        ctx.fillText('RIP BOZO', 250, cHeight / 2);
+        ctx.fillText(`RIP ${user}`, 250, cHeight / 2);
         ctx.fillText(`P1 ${score}`, 250, 355)
         if(!gameOverDelay){
             gameOverDelay = true;
@@ -261,6 +262,7 @@ function gameLoop() {
             }
             if(bricksArray.length == 0){ // reset the ball on grid clear
                 ballIsReady = true
+                gameOver = true; // game over condition
             }
         }
 

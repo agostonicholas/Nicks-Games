@@ -15,7 +15,7 @@
     },
     {
         "id": 3,
-        "name": "Minesweeper",
+        "name": "Mine Sweeper",
         "description": "Clear the mines without detonating them!",
         "image": "minesweeper/minesweeper.png",
         "link": "minesweeper/minesweeper.html"
