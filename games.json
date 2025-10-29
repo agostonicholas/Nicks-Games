@@ -12,5 +12,12 @@
         "description": "Break the bricks with the ball to score points!",
         "image": "brick-breaker/brick-breaker.png",
         "link": "brick-breaker/brick-breaker.html"
+    },
+    {
+        "id": 3,
+        "name": "Tone",
+        "description": "Avoid the balls...",
+        "image": "Tone/tone.png",
+        "link": "Tone/tone.html"
     }
 ]

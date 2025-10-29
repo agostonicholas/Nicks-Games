@@ -1,9 +1,11 @@
-export async function saveScore(game, user, score){
+export async function saveScore(user, score){
     try {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id") || "1";
         const response = await fetch('https://nicks-games-backend.onrender.com/api/save-score', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ game, user, score })
+            body: JSON.stringify({ id, username, score })
         });
     const data = await response.json();
     console.log('Score saved:', data);
@@ -14,7 +16,7 @@ export async function saveScore(game, user, score){
 
 export async function getLeaderboard(){
     try {
-        const response = await fetch('https://nicks-games-backend.onrender.com/getLeaderboard', {
+        const response = await fetch('https://nicks-games-backend.onrender.com/api/leaderboard/:id', {
             method: 'GET',
             headers: {'Content-Type': 'application/json'},
         });

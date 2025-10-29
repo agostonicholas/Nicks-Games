@@ -1,3 +1,5 @@
+import { saveScore } from "../backend-functions.js";
+
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
@@ -6,6 +8,7 @@ const cWidth = canvas.width; // canvas width
 const cHeight = canvas.height; // canvas height
 const keys = {}; // keys object to store key strokes
 const brickColors = ['blue', 'red', 'green', 'yellow', 'orange']
+const user = localStorage.getItem('username') || 'BOZO';
 
 class scoreboard{
     constructor(x, y, score){
@@ -112,6 +115,7 @@ window.addEventListener('keyup', (e) => {
     keys[e.key] = false; // set key to true when pressed
 });
 
+let scoreSaved = false;
 let score = 0;
 let paddlePlayer = new paddle(400, 550, 100, 10);
 let gameBall = new ball(450, 450, 10, 10);
@@ -181,8 +185,12 @@ function gameLoop() {
         ctx.clearRect(0, 0, cWidth, cHeight);
         ctx.fillStyle = 'white';
         ctx.font = '40px "Press Start 2P"'
-        ctx.fillText('RIP BOZO', 250, cHeight / 2);
-        ctx.fillText(`P1 ${score}`, 250, 355)
+        ctx.fillText(`RIP ${user}`, 250, cHeight / 2);
+        ctx.fillText(`P1 ${score}`, 250, 355);
+        if (!scoreSaved){    
+            saveScore(user, score);
+            scoreSaved = true;
+        }
         if(!gameOverDelay){
             gameOverDelay = true;
             gameOverSound.play();
@@ -192,6 +200,7 @@ function gameLoop() {
                 ballIsReady = true;
                 gameOver = false;
                 gameOverDelay = false;
+                scoreSaved = false;
 
                 bricksArray = [];
                 for (let row = 0; row < brickRows; row++) {
