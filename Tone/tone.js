@@ -6,11 +6,67 @@ const ctx = canvas.getContext('2d');
 // global variables
 const cWidth = canvas.width; // canvas width
 const cHeight = canvas.height; // canvas height
+const song1 = new Audio('assets/music/song1.mp3');
+const song2 = new Audio('assets/music/song2.mp3');
+const song3 = new Audio('assets/music/song3.mp3');
+const dead = new Audio('assets/sounds/explosion.mp3');
+const playlist = [song1, song2, song3];
 const keys = {}; // keys object to store key strokes
 const user = localStorage.getItem('username') || 'BOZO';
 
 let startTime = null;
 const timeElapsed = () => startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+let currentSongIndex = 0;
+let musicInitialized = false;
+let isMusicPlaying = false;
+
+function setupMusic() {
+    if (musicInitialized) return;
+    playlist.forEach((track) => {
+        track.loop = false;
+        track.addEventListener('ended', handleTrackEnded);
+    });
+    musicInitialized = true;
+}
+
+function handleTrackEnded() {
+    currentSongIndex = (currentSongIndex + 1) % playlist.length;
+    playCurrentSong(true);
+}
+
+function playCurrentSong(restart = false) {
+    setupMusic();
+    playlist.forEach((track, idx) => {
+        if (idx !== currentSongIndex) {
+            track.pause();
+            track.currentTime = 0;
+        }
+    });
+    const track = playlist[currentSongIndex];
+    if (restart) {
+        track.currentTime = 0;
+    }
+    track.play().then(() => {
+        isMusicPlaying = true;
+    }).catch((error) => {
+        isMusicPlaying = false;
+        console.warn('Unable to start music playback:', error);
+    });
+}
+
+function startMusic() {
+    if (!isMusicPlaying) {
+        playCurrentSong(true);
+    }
+}
+
+function stopMusic() {
+    if (!musicInitialized) return;
+    const track = playlist[currentSongIndex];
+    track.pause();
+    track.currentTime = 0;
+    isMusicPlaying = false;
+}
 
 window.addEventListener('keydown', (e) => {
     keys[e.key] = true; // set key to true when pressed
@@ -80,6 +136,8 @@ let gameLoopActive = false;
 let goodBall = new player(50, 50);
 let startScreenEnemies = [];
 let lastEnemySpawn = 0;
+const GAME_OVER_DRAW_DELAY = 250;
+const GAME_OVER_DISPLAY_DURATION = 7000;
 
 function circlesCollide(a, b) {
     const dx = a.x - b.x;
@@ -89,6 +147,7 @@ function circlesCollide(a, b) {
 }
 
 function startGameScreen() {
+    if (playGame) return;
     ctx.clearRect(0, 0, cWidth, cHeight);
     ctx.fillStyle = 'white';
     ctx.font = '32px "Press Start 2P"';
@@ -117,6 +176,7 @@ window.addEventListener('keydown', (e) => {
         playGame = true;
         gameLoopActive = true;
         startTime = Date.now();
+        startMusic();
         runGameLoop();
     }
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
@@ -134,6 +194,7 @@ function runGameLoop() {
     ctx.clearRect(0, 0, cWidth, cHeight);
     goodBall.draw();
     gameTimer.draw();
+    
     if (Date.now() - newEnemySpawn > 3000) {
         gameEnemies.push(new enemy(Math.random() * cWidth, Math.random() * cHeight));
         newEnemySpawn = Date.now();
@@ -144,10 +205,14 @@ function runGameLoop() {
         e.draw();
         e.move();
         if (circlesCollide(goodBall, e)) {
-            gameOver = true;
-            if (gameOver){ // handle collision
-                ctx.clearRect(0, 0, cWidth, cHeight);
+            if (!gameOver) {
+                dead.play();
+                stopMusic();
+                gameOver = true;
+                gameLoopActive = false;
                 setTimeout(() => {
+                    ctx.clearRect(0, 0, cWidth, cHeight);
+
                     ctx.fillStyle = 'white';
                     ctx.font = '32px "Press Start 2P"';
                     ctx.textAlign = 'center';
@@ -155,17 +220,31 @@ function runGameLoop() {
                     ctx.font = '20px "Press Start 2P"';
                     ctx.fillText(`You survived for ${timeElapsed()} seconds`, cWidth / 2, cHeight / 2);
                     ctx.fillText('Refresh to play again', cWidth / 2, cHeight / 2 + 40);
-                    if (!scoreSaved){
+
+                    if (!scoreSaved) {
                         saveScore(user, timeElapsed().toString());
                         scoreSaved = true;
                     }
-                }, 5000);
-                startGameScreen();
-                return;
+                }, GAME_OVER_DRAW_DELAY);
+
+                setTimeout(() => {
+                    gameEnemies = [];
+                    startScreenEnemies = [];
+                    lastEnemySpawn = Date.now();
+                    newEnemySpawn = Date.now();
+                    startTime = null;
+                    gameOver = false;
+                    playGame = false;
+                    scoreSaved = false;
+                    startGameScreen();
+                }, GAME_OVER_DRAW_DELAY + GAME_OVER_DISPLAY_DURATION);
             }
+            break;
         }
     }
-    requestAnimationFrame(runGameLoop);
+    if (gameLoopActive) {
+        requestAnimationFrame(runGameLoop);
+    }
 }
 
 startGameScreen();

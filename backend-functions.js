@@ -5,7 +5,7 @@ export async function saveScore(user, score){
         const response = await fetch('https://nicks-games-backend.onrender.com/api/save-score', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ id, username, score })
+            body: JSON.stringify({ id, username: user, score })
         });
     const data = await response.json();
     console.log('Score saved:', data);
