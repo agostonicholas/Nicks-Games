@@ -117,6 +117,26 @@ class enemy {
     }
 }
 
+class SeekerEnemy extends enemy {
+    constructor(x, y) {
+        super(x, y);
+        this.color = 'green';
+        this.speed = 1;
+    }
+    move() {
+        const dx = goodBall.x - this.x;
+        const dy = goodBall.y - this.y;
+        const distance = Math.hypot(dx, dy) || 1;
+        this.x += (dx / distance) * this.speed;
+        this.y += (dy / distance) * this.speed;
+
+        if (this.x < this.radius) this.x = this.radius;
+        if (this.x > cWidth - this.radius) this.x = cWidth - this.radius;
+        if (this.y < this.radius) this.y = this.radius;
+        if (this.y > cHeight - this.radius) this.y = cHeight - this.radius;
+    }
+}
+
 class timer {
     constructor(x, y){
         this.x = x;
@@ -138,6 +158,7 @@ let startScreenEnemies = [];
 let lastEnemySpawn = 0;
 const GAME_OVER_DRAW_DELAY = 250;
 const GAME_OVER_DISPLAY_DURATION = 7000;
+const SEEKER_SPAWN_INTERVAL = 10000;
 
 function circlesCollide(a, b) {
     const dx = a.x - b.x;
@@ -177,6 +198,8 @@ window.addEventListener('keydown', (e) => {
         gameLoopActive = true;
         startTime = Date.now();
         startMusic();
+        newEnemySpawn = Date.now();
+        lastSeekerSpawn = Date.now();
         runGameLoop();
     }
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
@@ -186,6 +209,7 @@ window.addEventListener('keydown', (e) => {
 
 let gameEnemies = [];
 let newEnemySpawn = Date.now();
+let lastSeekerSpawn = Date.now();
 let gameOver = false;
 let scoreSaved = false;
 
@@ -199,6 +223,10 @@ function runGameLoop() {
         gameEnemies.push(new enemy(Math.random() * cWidth, Math.random() * cHeight));
         newEnemySpawn = Date.now();
     }
+    if (Date.now() - lastSeekerSpawn > SEEKER_SPAWN_INTERVAL) {
+        gameEnemies.push(new SeekerEnemy(Math.random() * cWidth, Math.random() * cHeight));
+        lastSeekerSpawn = Date.now();
+    }
 
     // Draw all enemies
     for (let e of gameEnemies) {
@@ -206,6 +234,7 @@ function runGameLoop() {
         e.move();
         if (circlesCollide(goodBall, e)) {
             if (!gameOver) {
+                dead.currentTime = 0;
                 dead.play();
                 stopMusic();
                 gameOver = true;
@@ -232,6 +261,7 @@ function runGameLoop() {
                     startScreenEnemies = [];
                     lastEnemySpawn = Date.now();
                     newEnemySpawn = Date.now();
+                    lastSeekerSpawn = Date.now();
                     startTime = null;
                     gameOver = false;
                     playGame = false;
