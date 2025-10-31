@@ -178,7 +178,7 @@ function startGameScreen() {
     ctx.fillText('Press Enter to Start', cWidth / 2, cHeight / 2);
 
     // Spawn enemies every 2 seconds
-    if (Date.now() - lastEnemySpawn > 1000) {
+    if (Date.now() - lastEnemySpawn > 2000) {
         startScreenEnemies.push(new enemy(Math.random() * cWidth, Math.random() * cHeight));
         lastEnemySpawn = Date.now();
     }
@@ -219,7 +219,7 @@ function runGameLoop() {
     goodBall.draw();
     gameTimer.draw();
     
-    if (Date.now() - newEnemySpawn > 3000) {
+    if (Date.now() - newEnemySpawn > 1500) {
         gameEnemies.push(new enemy(Math.random() * cWidth, Math.random() * cHeight));
         newEnemySpawn = Date.now();
     }
