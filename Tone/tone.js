@@ -178,7 +178,7 @@ function startGameScreen() {
     ctx.fillText('Press Enter to Start', cWidth / 2, cHeight / 2);
 
     // Spawn enemies every 2 seconds
-    if (Date.now() - lastEnemySpawn > 2000) {
+    if (Date.now() - lastEnemySpawn > 1000) {
         startScreenEnemies.push(new enemy(Math.random() * cWidth, Math.random() * cHeight));
         lastEnemySpawn = Date.now();
     }
