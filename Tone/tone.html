@@ -23,15 +23,19 @@
     </header>
     <!--this is meant to be copy pastable for every game-->
     <main>
-        <!--canvas for the game screen-->
-        <!--script for pulling game details-->
-        <div class= "game"> 
-          <canvas class="game-canvas" id= "game-canvas" width="800" height="600"></canvas>
-          <div class= "game-details">
-            <script type="module" src="tone.js"></script>
-          </div>
-          <script src="../game-page.js"></script>
-        </div>
+      <div class="game"> 
+        <aside class="game-leaderboard">
+          <h3>Leaderboard</h3>
+          <ol class="leaderboard-list"></ol>
+          <p class="leaderboard-empty">Be the first to set a score!</p>
+        </aside>
+
+        <canvas class="game-canvas" id="game-canvas" width="800" height="600"></canvas>
+
+        <div class="game-details"></div>
       </div>
+
+      <script src="../game-page.js"></script>
+      <script type="module" src="tone.js"></script>
     </main>
   </body>

@@ -1,22 +1,38 @@
 export async function saveScore(user, score){
     try {
         const params = new URLSearchParams(window.location.search);
-        const id = params.get("id") || "1";
+        const rawId = params.get("id");
+        const id = Number(rawId ?? "1");
+
+        if (!Number.isInteger(id)) {
+            throw new Error(`Invalid game id "${rawId}"`);
+        }
+
         const response = await fetch('https://nicks-games-backend.onrender.com/api/save-score', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ id, username: user, score })
         });
-    const data = await response.json();
-    console.log('Score saved:', data);
+        const data = await response.json();
+        console.log('Score saved:', data);
+        return data;
     } catch (error) {
         console.error('Error saving score:', error);
+        throw error;
     }
 }
 
 export async function getLeaderboard(){
     try {
-        const response = await fetch('https://nicks-games-backend.onrender.com/api/leaderboard/:id', {
+        const params = new URLSearchParams(window.location.search);
+        const rawId = params.get("id");
+        const id = Number(rawId ?? "1");
+
+        if (!Number.isInteger(id)) {
+            throw new Error(`Invalid game id "${rawId}"`);
+        }
+
+        const response = await fetch(`https://nicks-games-backend.onrender.com/api/leaderboard/${id}`, {
             method: 'GET',
             headers: {'Content-Type': 'application/json'},
         });
