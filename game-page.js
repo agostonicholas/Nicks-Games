@@ -1,5 +1,21 @@
 const API_BASE = "https://nicks-games-backend.onrender.com";
 
+function getSiteBasePath() {
+  const segments = window.location.pathname.split("/").filter(Boolean);
+
+  if (window.location.hostname.endsWith("github.io") && segments.length) {
+    return `/${segments[0]}`;
+  }
+
+  if (segments[0] && segments[0].toLowerCase() === "nicks-games") {
+    return `/${segments[0]}`;
+  }
+
+  return "";
+}
+
+const ASSET_BASE = getSiteBasePath();
+
 function readGameId() {
   const params = new URLSearchParams(window.location.search);
   const rawId = params.get("id");
@@ -8,7 +24,7 @@ function readGameId() {
 }
 
 async function loadGameMeta(gameId) {
-  const res = await fetch("/games.json");
+  const res = await fetch(`${ASSET_BASE}/games.json`);
   if (!res.ok) {
     throw new Error(`Failed to load games.json: ${res.status}`);
   }
