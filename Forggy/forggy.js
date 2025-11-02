@@ -26,6 +26,8 @@
 // trees can spawn on stack on tiles next to them however they can only spawn on grass tiles and they cannot block the path forward
 // logs get a random speed
 // somehow need to ensure that there is always a way forward
+import { saveScore, getLeaderboard } from '../backend-functions.js';
+
 
 // Grab the playfield so everything that follows has somewhere to show up.
 const canvas = document.getElementById('game-canvas');
@@ -303,6 +305,30 @@ function handleScoreMilestone(newScore) {
       playSound(audio);
       break;
     }
+  }
+}
+
+async function submitScore(finalScore) {
+  if (!Number.isFinite(finalScore) || finalScore <= 0) {
+    return;
+  }
+  const username = (window.localStorage?.getItem('username') || 'Guest').trim() || 'Guest';
+  try {
+    await saveScore(username, finalScore);
+  } catch (error) {
+    console.error('Failed to save score:', error);
+  }
+
+  try {
+    const data = await getLeaderboard();
+    const top5 = data?.top5 ?? [];
+    if (typeof window.renderLeaderboard === 'function') {
+      window.renderLeaderboard(top5);
+    } else if (typeof renderLeaderboard === 'function') {
+      renderLeaderboard(top5);
+    }
+  } catch (error) {
+    console.error('Failed to refresh leaderboard:', error);
   }
 }
 
@@ -1559,6 +1585,7 @@ function resetFrog() {
 
 function handleFrogDeath(reason) {
   console.log(`Frog croaked: ${reason}`);
+  const finalScore = score;
   const normalizedReason = typeof reason === 'string' ? reason.toLowerCase() : '';
   if (normalizedReason.includes('car')) {
     playSound(sounds.carDeath, 0.9);
@@ -1569,6 +1596,9 @@ function handleFrogDeath(reason) {
     normalizedReason.includes('void')
   ) {
     playSound(sounds.waterDeath, 0.9);
+  }
+  if (gameStarted && finalScore > 0) {
+    submitScore(finalScore);
   }
   resetLanePlanner();
   rebuildGrid();
