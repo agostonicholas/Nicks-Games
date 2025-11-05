@@ -1,3 +1,5 @@
+import { saveScore, getLeaderboard } from '../backend-functions.js';
+
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas?.getContext('2d');
 
@@ -159,6 +161,10 @@ const ticketState = {
 let ticketIdCounter = 1;
 let audioUnlocked = false;
 
+const leaderboardState = {
+  submittedForSession: false,
+};
+
 const sounds = Object.fromEntries(
   Object.entries(SOUND_DEFINITIONS).map(([key, file]) => [key, loadSound(file)]),
 );
@@ -301,6 +307,46 @@ function playSound(name) {
   }
 }
 
+function getStoredUsername() {
+  const username = window.localStorage?.getItem('username');
+  const trimmed = typeof username === 'string' ? username.trim() : '';
+  return trimmed.length ? trimmed : 'Guest';
+}
+
+async function submitFinalScore(rawScore) {
+  if (leaderboardState.submittedForSession) {
+    return;
+  }
+
+  const score = Number.isFinite(rawScore) ? Math.max(0, Math.round(rawScore)) : 0;
+  leaderboardState.submittedForSession = true;
+
+  if (score <= 0) {
+    return;
+  }
+
+  const username = getStoredUsername();
+
+  try {
+    await saveScore(username, score);
+  } catch (error) {
+    console.error('Failed to save score:', error);
+    return;
+  }
+
+  try {
+    const data = await getLeaderboard();
+    const top5 = data?.top5 ?? [];
+    if (typeof window.renderLeaderboard === 'function') {
+      window.renderLeaderboard(top5);
+    } else if (typeof renderLeaderboard === 'function') {
+      renderLeaderboard(top5);
+    }
+  } catch (error) {
+    console.error('Failed to refresh leaderboard:', error);
+  }
+}
+
 function computeTicketTimeMs(effectType = effectState.type, ingredientCount = ticketState.currentTicket?.ingredients.length ?? 0) {
   if (effectType === 'monster') {
     return GAME_RULES.monsterTicketTimeMs;
@@ -349,6 +395,7 @@ function loseLife(reason) {
     effectState.ticketsUntilNextRoll = 5;
     trayDisplayOrder = defaultTrayDisplayOrder.slice();
     recalculateIngredientLayout();
+    submitFinalScore(ticketState.score);
   }
 }
 
@@ -374,6 +421,7 @@ function startGame() {
   ticketState.lastResult = null;
   ticketState.remainingMs = 0;
   ticketIdCounter = 1;
+  leaderboardState.submittedForSession = false;
 
   effectState.type = 'none';
   effectState.remainingTickets = 0;
@@ -1161,8 +1209,12 @@ function drawStartScreen() {
   ctx.restore();
 }
 
-function formatCurrency(value) {
-  return `$${value.toFixed(2)}`;
+function formatScore(value) {
+  if (!Number.isFinite(value)) {
+    return '0';
+  }
+  const score = Math.max(0, Math.round(value));
+  return String(score);
 }
 
 function formatTimer(ms) {
@@ -1225,7 +1277,7 @@ function drawTicketOverlay() {
 
   ctx.font = "11px 'Press Start 2P', monospace";
   textY += headerHeight;
-  ctx.fillText(`Score: ${formatCurrency(ticketState.score)}`, startX + padding, textY);
+  ctx.fillText(`Score: ${formatScore(ticketState.score)}`, startX + padding, textY);
 
   textY += scoreHeight;
   ctx.fillText(`Lives: ${renderLives()}`, startX + padding, textY);
@@ -1309,7 +1361,7 @@ function drawGameOverOverlay() {
   ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 40);
 
   ctx.font = "18px 'Press Start 2P', monospace";
-  ctx.fillText(`Final Score: ${formatCurrency(ticketState.score)}`, canvas.width / 2, canvas.height / 2 + 10);
+  ctx.fillText(`Final Score: ${formatScore(ticketState.score)}`, canvas.width / 2, canvas.height / 2 + 10);
 
   ctx.font = "14px 'Press Start 2P', monospace";
   ctx.fillText('Click to restart', canvas.width / 2, canvas.height / 2 + 60);
